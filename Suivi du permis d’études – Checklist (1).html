@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suivi du permis d’études – Checklist</title>
+<style>
+:root{--bg:#f5f6fa;--card:#fff;--tx:#1a1f2b;--mut:#6b7280;--bd:#e2e5ee;--ac:#2563eb;--act:#fff;--ok:#16a34a;--bad:#dc2626;--warn:#d97706;--in:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1117;--card:#171b24;--tx:#e8eaf0;--mut:#9aa3b2;--bd:#2a3140;--ac:#5b8def;--act:#0e1117;--ok:#34d399;--bad:#f87171;--warn:#fbbf24;--in:#0f131b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1117;--card:#171b24;--tx:#e8eaf0;--mut:#9aa3b2;--bd:#2a3140;--ac:#5b8def;--act:#0e1117;--ok:#34d399;--bad:#f87171;--warn:#fbbf24;--in:#0f131b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;margin:0 0 2px}h2{margin:0;font-size:1.25rem}h3{margin:0 0 10px;font-size:1rem;color:var(--ac)}
+.mut{color:var(--mut);font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
+.head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 11px}
+button:hover{border-color:var(--ac)}
+button.pri{background:var(--ac);color:var(--act);border-color:var(--ac)}
+button.dng{color:var(--bad)}
+input,select{font:inherit;background:var(--in);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:6px 8px;max-width:100%}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.tab.on{background:var(--ac);color:var(--act);border-color:var(--ac)}
+.prog{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;margin:6px 0 4px}
+.prog div{height:100%;background:var(--ok);transition:width .3s}
+.row{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--bd)}
+.row:first-of-type{border-top:0}
+.row input[type=checkbox]{width:22px;height:22px;accent-color:var(--ok)}
+.row.done .lab{text-decoration:line-through;color:var(--mut)}
+.lab{font-weight:500}
+.row label{display:flex;flex-direction:column;font-size:.72rem;color:var(--mut);grid-column:2}
+.row label input{width:100%;max-width:200px}
+.fields{grid-column:2;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.fields label{grid-column:auto}
+.fields input[type=number]{width:80px}
+.act{display:flex;gap:6px}
+.b{font-size:.7rem;padding:1px 8px;border-radius:99px;border:1px solid;margin-left:6px;white-space:nowrap}
+.b.ok{color:var(--ok)}.b.bad{color:var(--bad)}.b.warn{color:var(--warn)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.form input{width:100%}
+.foot{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+@media print{.noprint,button,.form,.foot{display:none!important}body{background:#fff;color:#000}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎓 Suivi du permis d’études</h1>
+  <div class="mut">Cochez une étape : la date du jour s’inscrit dans « Validé le » et la date limite de l’étape suivante se calcule automatiquement. Tout est modifiable.</div>
+  <div class="tabs" id="tabs"></div>
+  <div class="card noprint">
+    <h3>➕ Ajouter une personne</h3>
+    <div class="form">
+      <input id="pn" placeholder="Nom complet">
+      <input id="ps" placeholder="Établissement">
+      <input id="pp" placeholder="Spécialité / programme">
+      <button class="pri" data-a="addp">Créer la checklist</button>
+    </div>
+  </div>
+  <div id="main"></div>
+  <div class="foot noprint">
+    <button data-a="exp">⬇ Exporter (sauvegarde)</button>
+    <button data-a="imp">⬆ Importer</button>
+    <button data-a="prt">🖨 Imprimer</button>
+    <button class="pri" data-a="app">💻 Télécharger l’application</button>
+    <input type="file" id="file" accept=".json" hidden>
+  </div>
+  <div class="mut noprint" id="st">✔ Sauvegarde automatique activée</div>
+  <div class="card noprint"><h3>💻 Utiliser comme une application</h3><div class="mut">Le bouton « Télécharger l’application » crée un fichier unique qui contient le site et toutes vos données. Double-cliquez dessus pour l’ouvrir, même sans internet. Pour l’avoir sur le bureau, enregistrez-le dans le dossier Bureau, ou ouvrez-le dans Chrome puis menu ⋮ → « Enregistrer et partager » → « Créer un raccourci ». Chaque modification est sauvegardée automatiquement dans le navigateur, et dans votre compte Claude quand il est disponible (accès depuis un autre appareil).</div></div>
+</div>
+<script>
+var KEY="permis_etudes_v1";
+var DEF=[
+["Admission","Vérifier que l’école figure sur la liste des EED",7],
+["Admission","Obtenir la lettre d’acceptation originale",30],
+["Admission","Obtenir l’AAP 2026 (ou le CAQ pour le Québec)",21],
+["Identité","Passeport valide, toutes les pages scannées",5],
+["Identité","Photo numérique conforme",3],
+["Identité","Acte de naissance",7],
+["Parcours scolaire","Diplômes et relevés de notes",21],
+["Parcours scolaire","Test de langue (si exigé par l’école)",30],
+["Finances","Réunir les fonds minimum requis (vie + scolarité + transport)",30],
+["Finances","Relevés bancaires récents (4 à 6 mois)",7],
+["Finances","Preuve de l’origine des fonds",14],
+["Finances","Lettre de prise en charge et pièces du garant (si applicable)",7],
+["Lettre d’intention","Rédiger la lettre d’intention",10],
+["Si demandé par IRCC","Examen médical",14],
+["Si demandé par IRCC","Certificat de police",21],
+["Si demandé par IRCC","Traductions certifiées",14],
+["Si demandé par IRCC","Anciens visas et refus antérieurs déclarés",3],
+["Soumission","Créer le compte IRCC et obtenir la liste de contrôle",2],
+["Soumission","Relecture finale (aucune contradiction)",3],
+["Soumission","Téléverser tous les documents",2],
+["Soumission","Payer les frais (150 $ permis + 85 $ biométrie)",1],
+["Après le dépôt","Faire la biométrie (30 jours maximum)",7],
+["Après le dépôt","Suivre le compte IRCC et répondre aux demandes",60],
+["Arrivée","Logement, billet d’avion, assurance",30]
+];
+var SEED=null;
+var dbRef=null,tmr=null;
+var S=load();
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.people))return s}catch(e){}if(SEED&&Array.isArray(SEED.people))return SEED;return{people:[],cur:null}}
+function setStatus(t){var e=document.getElementById("st");if(e)e.textContent=t}
+function save(){S.u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S));setStatus("✔ Enregistré automatiquement"+(dbRef?" (navigateur + compte)":" (navigateur)"))}catch(e){setStatus("⚠ Sauvegarde locale impossible : utilisez Exporter")}clearTimeout(tmr);if(dbRef)tmr=setTimeout(pushCloud,800)}
+function pushCloud(){if(!dbRef)return;dbRef.set({json:JSON.stringify(S),u:S.u}).catch(function(){setStatus("⚠ Synchronisation du compte indisponible")})}
+function cloudInit(){
+  if(!window.claude||!claude.use)return;
+  Promise.all([claude.use("db"),claude.use("user")]).then(function(r){var db=r[0],us=r[1];if(!db||!us)return;return us.id().then(function(id){if(!id)return;dbRef=db.doc("data/users/"+id+"/state");return dbRef.get().then(function(s){var c=s.exists?s.data():null;if(c&&c.json&&(+c.u||0)>(S.u||0)){try{var d=JSON.parse(c.json);if(d&&Array.isArray(d.people)){S=d;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render()}}catch(e){}}else if(S.people.length)pushCloud();setStatus("✔ Synchronisé avec votre compte")})})}).catch(function(){})
+}
+function saveFile(name,data,mime){
+  var go=function(){var u=URL.createObjectURL(new Blob([data],{type:mime})),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},1500)};
+  if(!window.claude||!claude.use){go();return}
+  claude.use("downloads").then(function(d){if(!d){go();return}return d.save({filename:name,data:data}).catch(function(e){if(e&&e.code!=="declined")alert("Téléchargement indisponible ici.")})}).catch(go)
+}
+function dlApp(){
+  var c=document.documentElement.cloneNode(true);
+  c.querySelector("#main").innerHTML="";c.querySelector("#tabs").innerHTML="";
+  c.querySelectorAll("script[src]").forEach(function(s){s.remove()});
+  var h="<!doctype html>\n"+c.outerHTML,seed=JSON.stringify(S).replace(/</g,"\\u003c");
+  h=h.replace("var SEED="+"null;",function(){return "var SEED="+seed+";"});
+  saveFile("Suivi-permis-etudes.html",h,"text/html")
+}
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function uid(){return Math.random().toString(36).slice(2,9)}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function today(){return iso(new Date())}
+function addDays(s,n){var d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return iso(d)}
+function diff(s){return Math.round((new Date(s+"T12:00:00")-new Date(today()+"T12:00:00"))/864e5)}
+function cur(){return S.people.filter(function(p){return p.id===S.cur})[0]}
+function mk(name,school,spec){var t=today();return{id:uid(),name:name,school:school,spec:spec,start:t,items:DEF.map(function(x,i){return{id:uid(),sec:x[0],label:x[1],days:x[2],done:false,validated:"",deadline:i?"":addDays(t,x[2]),man:false}})}}
+function cascade(p,i){var it=p.items[i],nx=p.items[i+1];if(nx&&!nx.man&&!nx.done)nx.deadline=it.done&&it.validated?addDays(it.validated,nx.days):""}
+function render(){
+  $("#tabs").innerHTML=S.people.map(function(p){return '<button class="tab '+(p.id===S.cur?"on":"")+'" data-a="tab" data-p="'+p.id+'">'+esc(p.name)+'</button>'}).join("");
+  var p=cur();
+  if(!p){$("#main").innerHTML='<div class="card mut">Aucune personne pour l’instant. Ajoutez-en une ci-dessus pour démarrer la checklist.</div>';return}
+  var n=p.items.length,d=p.items.filter(function(i){return i.done}).length,pc=n?Math.round(d/n*100):0;
+  var h='<div class="card"><div class="head"><div><h2>'+esc(p.name)+'</h2><div class="mut">'+esc(p.school||"Établissement non renseigné")+' · '+esc(p.spec||"Spécialité non renseignée")+'</div></div><div class="act noprint"><button data-a="editp">Modifier</button><button class="dng" data-a="delp">Supprimer</button></div></div><div class="prog"><div style="width:'+pc+'%"></div></div><div class="mut">'+d+' / '+n+' étapes validées ('+pc+' %)</div></div>';
+  var last=null,secs=[];
+  p.items.forEach(function(it,i){
+    if(it.sec!==last){if(last!==null)h+="</div>";h+='<div class="card"><h3>'+esc(it.sec)+'</h3>';last=it.sec}
+    if(secs.indexOf(it.sec)<0)secs.push(it.sec);
+    var dd=it.deadline?diff(it.deadline):null,st="";
+    if(it.done)st='<span class="b ok">Validé</span>';
+    else if(dd!==null&&dd<0)st='<span class="b bad">En retard de '+(-dd)+' j</span>';
+    else if(dd!==null&&dd<=3)st='<span class="b warn">Bientôt</span>';
+    h+='<div class="row '+(it.done?"done":"")+'" data-i="'+i+'"><input type="checkbox" data-a="chk" '+(it.done?"checked":"")+'><div class="lab">'+esc(it.label)+st+'</div><div class="fields"><label>Validé le<input type="date" data-a="val" value="'+it.validated+'" '+(it.done?"":"disabled")+'></label><label>Date limite de soumission<input type="date" data-a="dl" value="'+it.deadline+'"></label><label>Délai (jours)<input type="number" min="0" data-a="days" value="'+it.days+'"></label><div class="act noprint"><button data-a="eit" title="Renommer">✎</button><button class="dng" data-a="dit" title="Supprimer">✕</button></div></div></div>';
+  });
+  if(last!==null)h+="</div>";
+  h+='<div class="card noprint"><h3>➕ Ajouter une étape personnalisée</h3><div class="form"><input id="ns" list="secs" placeholder="Section (existante ou nouvelle)"><datalist id="secs">'+secs.map(function(s){return '<option value="'+esc(s)+'">'}).join("")+'</datalist><input id="nl" placeholder="Intitulé de l’étape"><input id="nd" type="number" min="0" value="7" title="Délai en jours"><button class="pri" data-a="addi">Ajouter l’étape</button></div></div>';
+  $("#main").innerHTML=h;
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-a]");if(!b)return;var a=b.dataset.a,p=cur(),row=b.closest(".row"),i=row?+row.dataset.i:-1;
+  if(a==="tab"){S.cur=b.dataset.p}
+  else if(a==="addp"){var nm=$("#pn").value.trim();if(!nm){$("#pn").focus();return}var q=mk(nm,$("#ps").value.trim(),$("#pp").value.trim());S.people.push(q);S.cur=q.id;$("#pn").value=$("#ps").value=$("#pp").value=""}
+  else if(a==="editp"&&p){var x=prompt("Nom",p.name);if(x===null)return;p.name=x.trim()||p.name;x=prompt("Établissement",p.school);if(x!==null)p.school=x.trim();x=prompt("Spécialité",p.spec);if(x!==null)p.spec=x.trim()}
+  else if(a==="delp"&&p){if(!confirm("Supprimer "+p.name+" et toute sa checklist ?"))return;S.people=S.people.filter(function(z){return z.id!==p.id});S.cur=S.people.length?S.people[0].id:null}
+  else if(a==="eit"&&p){var l=prompt("Nouvel intitulé",p.items[i].label);if(l===null||!l.trim())return;p.items[i].label=l.trim()}
+  else if(a==="dit"&&p){if(!confirm("Supprimer cette étape ?"))return;p.items.splice(i,1);if(i>0)cascade(p,i-1)}
+  else if(a==="addi"&&p){var lb=$("#nl").value.trim();if(!lb){$("#nl").focus();return}var sc=$("#ns").value.trim()||"Autres",it={id:uid(),sec:sc,label:lb,days:+$("#nd").value||0,done:false,validated:"",deadline:"",man:false},pos=-1;p.items.forEach(function(z,k){if(z.sec===sc)pos=k});if(pos<0){p.items.push(it);pos=p.items.length-1}else p.items.splice(pos+1,0,it);if(pos>=0&&p.items[pos]&&p.items[pos]!==it)cascade(p,pos)}
+  else if(a==="exp"){saveFile("suivi-permis-etudes-"+today()+".json",JSON.stringify(S,null,1),"application/json");return}
+  else if(a==="app"){dlApp();return}
+  else if(a==="imp"){$("#file").click();return}
+  else if(a==="prt"){window.print();return}
+  save();render();
+});
+document.addEventListener("change",function(e){
+  var t=e.target;
+  if(t.id==="file"){var f=t.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||!Array.isArray(d.people))throw 0;if(!confirm("Remplacer les données actuelles par ce fichier ?"))return;S={people:d.people,cur:d.cur||(d.people[0]&&d.people[0].id)||null};save();render()}catch(x){alert("Fichier invalide.")}};r.readAsText(f);t.value="";return}
+  var a=t.dataset.a,p=cur(),row=t.closest(".row");if(!a||!p||!row)return;
+  var i=+row.dataset.i,it=p.items[i];
+  if(a==="chk"){it.done=t.checked;it.validated=t.checked?today():"";cascade(p,i)}
+  else if(a==="val"){it.validated=t.value||today();cascade(p,i)}
+  else if(a==="dl"){it.deadline=t.value;it.man=!!t.value}
+  else if(a==="days"){it.days=Math.max(0,+t.value||0);if(!it.man&&!it.done){var base=i===0?p.start:(p.items[i-1].done?p.items[i-1].validated:"");it.deadline=base?addDays(base,it.days):""}}
+  save();render();
+});
+render();
+cloudInit();
+</script>
+</body>
+</html>
